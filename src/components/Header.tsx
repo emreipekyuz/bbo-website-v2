@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Tipler ve Menü Verisi (Değişiklik yok)
+// Tipler ve Menü Verisi
 type MenuItem = { href: string; label: string };
 type MenuGroup = { label: string; items: MenuItem[] };
 
@@ -33,43 +33,68 @@ const singleLinks: MenuItem[] = [
 ];
 
 export default function Header() {
-  const [open, setOpen] = useState<string | null>(null);
+  const [openDesktop, setOpenDesktop] = useState<string | null>(null); // desktop hover
+  const [mobileOpen, setMobileOpen] = useState(false); // hamburger paneli
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // mobil akordeon
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
-  // Açılır menü kontrol mantığı (Değişiklik yok)
+  // dışarı tıklayınca mobil paneli kapat
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (mobileOpen && panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [mobileOpen]);
+
   const clearCloseTimer = () => {
     if (closeTimer.current) {
       clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
   };
-
   const openMenu = (label: string) => {
     clearCloseTimer();
-    setOpen(label);
+    setOpenDesktop(label);
   };
-
   const scheduleClose = () => {
     clearCloseTimer();
-    closeTimer.current = setTimeout(() => setOpen(null), 150);
+    closeTimer.current = setTimeout(() => setOpenDesktop(null), 150);
   };
 
-  // Menü elemanları için ortak çerçeve stili
-  const frameClasses = "px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors duration-200";
+  const frameClasses =
+    "px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors duration-200";
+
+  const toggleGroup = (label: string) =>
+    setExpanded((p) => ({ ...p, [label]: !p[label] }));
+
+  const closeAll = () => {
+    setOpenDesktop(null);
+    setMobileOpen(false);
+  };
 
   return (
-    // 1. Arka plan lacivert ve sabit hale getirildi
     <header className="bg-slate-900 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-white text-lg">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-bold text-white text-lg"
+          onClick={closeAll}
+        >
           Bir Bulut Olsam Derneği
         </Link>
 
-        {/* Menü + CTA */}
-        <div className="flex items-center gap-6">
-          <nav className="hidden md:flex items-center gap-2 relative">
-            {/* Açılır Menüler */}
+        {/* Desktop NAV */}
+        <div className="hidden md:flex items-center gap-6">
+          <nav
+            className="flex items-center gap-2 relative"
+            aria-label="Ana menü"
+          >
+            {/* Açılır Menüler (Desktop: hover) */}
             {dropdownMenus.map((m) => (
               <div
                 key={m.label}
@@ -77,23 +102,30 @@ export default function Header() {
                 onMouseEnter={() => openMenu(m.label)}
                 onMouseLeave={scheduleClose}
               >
-                {/* 2. Başlıklara çerçeve eklendi */}
-                <button className={frameClasses}>
+                <button
+                  className={frameClasses}
+                  aria-haspopup="menu"
+                  aria-expanded={openDesktop === m.label}
+                >
                   {m.label}
                 </button>
                 <div
                   className={`absolute left-0 top-full mt-2 bg-slate-800 border border-slate-700 shadow-xl rounded-lg p-2 grid gap-1 min-w-[240px] transition-all duration-200 transform origin-top ${
-                    open === m.label ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                    openDesktop === m.label
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-95 pointer-events-none"
                   }`}
                   onMouseEnter={clearCloseTimer}
                   onMouseLeave={scheduleClose}
+                  role="menu"
                 >
                   {m.items.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       className="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white rounded-md"
-                      onClick={() => setOpen(null)}
+                      onClick={closeAll}
+                      role="menuitem"
                     >
                       {item.label}
                     </Link>
@@ -101,16 +133,21 @@ export default function Header() {
                 </div>
               </div>
             ))}
+
             {/* Tekil Linkler */}
             {singleLinks.map((link) => (
-              // 2. Başlıklara çerçeve eklendi
-              <Link key={link.href} href={link.href} className={frameClasses}>
+              <Link
+                key={link.href}
+                href={link.href}
+                className={frameClasses}
+                onClick={closeAll}
+              >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Gönüllü Ol butonu */}
+          {/* Gönüllü Ol (Desktop) */}
           <a
             href="https://forms.gle/b6jD1YLVgvns2gGTA"
             target="_blank"
@@ -120,6 +157,108 @@ export default function Header() {
             ☁️ Gönüllü Ol
           </a>
         </div>
+
+        {/* Hamburger (Mobile) */}
+        <button
+          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-white"
+          aria-label="Menüyü aç/kapat"
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((s) => !s)}
+        >
+          {/* ikon */}
+          <svg
+            className="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            {mobileOpen ? (
+              <path strokeWidth="2" strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeWidth="2" strokeLinecap="round" d="M3 6h18M3 12h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Panel */}
+      <div
+        ref={panelRef}
+        className={`md:hidden bg-slate-900 border-t border-slate-800 transition-[max-height,opacity] duration-200 overflow-hidden ${
+          mobileOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+        }`}
+        aria-hidden={!mobileOpen}
+      >
+        <nav className="px-4 py-3 space-y-2" aria-label="Mobil menü">
+          {/* Grup başlıkları akordeon */}
+          {dropdownMenus.map((g) => {
+            const isOpen = !!expanded[g.label];
+            return (
+              <div key={g.label} className="border border-slate-800 rounded-lg">
+                <button
+                  className="w-full flex items-center justify-between px-4 py-3 text-slate-200"
+                  onClick={() => toggleGroup(g.label)}
+                  aria-expanded={isOpen}
+                  aria-controls={`section-${g.label}`}
+                >
+                  <span className="text-sm font-medium">{g.label}</span>
+                  <svg
+                    className={`h-5 w-5 transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                <div
+                  id={`section-${g.label}`}
+                  className={`grid gap-1 px-2 pb-2 transition-[max-height] duration-200 overflow-hidden ${
+                    isOpen ? "max-h-96" : "max-h-0"
+                  }`}
+                >
+                  {g.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="block px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 rounded-md"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Tekil linkler */}
+          <div className="grid gap-2">
+            {singleLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block px-4 py-3 text-sm font-medium text-slate-200 rounded-md border border-slate-800 hover:bg-slate-800"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Gönüllü Ol (Mobile) */}
+          <a
+            href="https://forms.gle/b6jD1YLVgvns2gGTA"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex w-full items-center justify-center bg-white text-slate-900 font-bold px-4 py-3 rounded-lg hover:bg-slate-200"
+            onClick={() => setMobileOpen(false)}
+          >
+            ☁️ Gönüllü Ol
+          </a>
+        </nav>
       </div>
     </header>
   );
