@@ -1,60 +1,100 @@
+// app/blog/page.tsx
 import Link from "next/link";
 import Image from "next/image";
-import { sanityClient } from "@/lib/sanity.client";
+import { PortableTextBlock } from "@portabletext/react";
+import { createClient } from "next-sanity";
 import { urlFor } from "@/lib/sanity.image";
 
-interface Post {
-  _id: string;
+// --- Sanity client (gerekirse kendi client'ını kullanabilirsin) ---
+const client = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "production",
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2024-01-01",
+  useCdn: true,
+});
+
+// --- Types ---
+type PostCard = {
   title: string;
-  slug: { current: string };
-  excerpt?: string;
-  mainImage?: any;
+  slug: string;
   publishedAt?: string;
-}
+  mainImage?: unknown;
+  // body?: PortableTextBlock[]; // kısaltma/özet istersek açarız
+};
 
-async function getPosts(): Promise<Post[]> {
-  const query = `*[_type == "post"] | order(publishedAt desc){
-    _id, title, slug, excerpt, mainImage, publishedAt
+// Bu sayfanın statik üretildiğini açıkça belirtelim
+export const dynamic = "force-static";
+
+async function getPosts(): Promise<PostCard[]> {
+  const query = `*[_type == "post"] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    publishedAt,
+    mainImage
   }`;
-  return await sanityClient.fetch(query);
+  const posts = await client.fetch<PostCard[]>(query);
+  return posts ?? [];
 }
 
-export default async function BlogPage() {
+export default async function BlogIndexPage() {
   const posts = await getPosts();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8">Blog</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {posts.map((post) => (
-          <Link
-            key={post._id}
-            href={`/blog/${post.slug.current}`}
-            className="block border rounded-lg overflow-hidden hover:shadow-lg transition"
-          >
-            {post.mainImage && (
-              <Image
-                src={urlFor(post.mainImage).width(600).height(400).url()}
-                alt={post.title}
-                width={600}
-                height={400}
-                className="w-full h-48 object-cover"
-              />
-            )}
-            <div className="p-4">
-              <h2 className="text-xl font-semibold">{post.title}</h2>
-              {post.excerpt && (
-                <p className="text-gray-600 text-sm mt-2">{post.excerpt}</p>
+    <main className="max-w-6xl mx-auto px-4 py-12">
+      <h1 className="text-3xl md:text-4xl font-bold mb-8">Blog</h1>
+
+      {posts.length === 0 ? (
+        <p className="text-gray-400">Şu anda yayında blog yazısı bulunmuyor.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map((post) => (
+            <article
+              key={post.slug}
+              className="bg-white text-black rounded-xl overflow-hidden shadow hover:shadow-lg transition"
+            >
+              {/* Kapak görseli */}
+              {post.mainImage ? (
+                <div className="w-full h-48 bg-gray-200">
+                  <Image
+                    src={urlFor(post.mainImage).width(800).height(450).url()}
+                    alt={post.title}
+                    width={800}
+                    height={450}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-gray-200" />
               )}
-              {post.publishedAt && (
-                <p className="text-xs text-gray-400 mt-1">
-                  {new Date(post.publishedAt).toLocaleDateString("tr-TR")}
-                </p>
-              )}
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+
+              {/* İçerik */}
+              <div className="p-5">
+                <h2 className="text-lg font-semibold mb-2 line-clamp-2">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="hover:underline"
+                  >
+                    {post.title}
+                  </Link>
+                </h2>
+
+                {post.publishedAt && (
+                  <p className="text-sm text-gray-600 mb-3">
+                    {new Date(post.publishedAt).toLocaleDateString("tr-TR")}
+                  </p>
+                )}
+
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="inline-block text-sm text-blue-600 hover:underline font-medium"
+                >
+                  Devamını oku →
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }
