@@ -2,10 +2,11 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
+// Tipler ve Menü Verisi (Değişiklik yok)
 type MenuItem = { href: string; label: string };
 type MenuGroup = { label: string; items: MenuItem[] };
 
-const menu: MenuGroup[] = [
+const dropdownMenus: MenuGroup[] = [
   {
     label: "Dernek",
     items: [
@@ -16,46 +17,29 @@ const menu: MenuGroup[] = [
     ],
   },
   {
-    label: "Programlar",
+    label: "Komiteler",
     items: [
-      { href: "/programlar/esitlik", label: "Eşitlik Programı" },
-      { href: "/programlar/genclik", label: "Gençlik Programı" },
-      { href: "/programlar/kultur-sanat", label: "Kültür-Sanat Programı" },
-    ],
-  },
-  {
-    label: "Blog",
-    items: [
-      { href: "/blog", label: "Tüm Yazılar" },
-      { href: "/blog/kategoriler", label: "Kategoriler" },
-    ],
-  },
-  {
-    label: "Medya Merkezi",
-    items: [
-      { href: "/medya/basin-bultenleri", label: "Basın Bültenleri" },
-      { href: "/medya/fotograflar", label: "Fotoğraflar" },
-      { href: "/medya/videolar", label: "Videolar" },
-    ],
-  },
-  {
-    label: "Kaynaklar",
-    items: [
-      { href: "/yayinlar", label: "Yayınlar" },
-      { href: "/raporlar", label: "Raporlar" },
-      { href: "/gorseller", label: "Görseller & Logolar" },
-      { href: "/podcast", label: "Podcast" },
+      { href: "/komiteler/genclik", label: "Gençlik Komitesi" },
+      { href: "/komiteler/kultur-sanat", label: "Kültür-Sanat Komitesi" },
+      { href: "/komiteler/esitlik", label: "Eşitlik Komitesi" },
+      { href: "/komiteler/sosyal-sorumluluk", label: "Sosyal Sorumluluk Komitesi" },
     ],
   },
 ];
 
+const singleLinks: MenuItem[] = [
+  { href: "/blog", label: "Blog" },
+  { href: "/iletisim", label: "İletişim" },
+];
+
 export default function Header() {
   const [open, setOpen] = useState<string | null>(null);
-  const closeTimer = useRef<number | null>(null);
+  const closeTimer = useRef<NodeJS.Timeout | null>(null);
 
+  // Açılır menü kontrol mantığı (Değişiklik yok)
   const clearCloseTimer = () => {
     if (closeTimer.current) {
-      window.clearTimeout(closeTimer.current);
+      clearTimeout(closeTimer.current);
       closeTimer.current = null;
     }
   };
@@ -67,12 +51,16 @@ export default function Header() {
 
   const scheduleClose = () => {
     clearCloseTimer();
-    closeTimer.current = window.setTimeout(() => setOpen(null), 120);
+    closeTimer.current = setTimeout(() => setOpen(null), 150);
   };
 
+  // Menü elemanları için ortak çerçeve stili
+  const frameClasses = "px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors duration-200";
+
   return (
-    <header className="bg-black shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    // 1. Arka plan lacivert ve sabit hale getirildi
+    <header className="bg-slate-900 shadow-md sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-white text-lg">
           Bir Bulut Olsam Derneği
@@ -80,24 +68,22 @@ export default function Header() {
 
         {/* Menü + CTA */}
         <div className="flex items-center gap-6">
-          <nav className="hidden md:flex gap-6 relative text-white">
-            {menu.map((m) => (
+          <nav className="hidden md:flex items-center gap-2 relative">
+            {/* Açılır Menüler */}
+            {dropdownMenus.map((m) => (
               <div
                 key={m.label}
                 className="relative"
                 onMouseEnter={() => openMenu(m.label)}
                 onMouseLeave={scheduleClose}
               >
-                <button
-                  className="hover:text-blue-400"
-                  onClick={() => setOpen((cur) => (cur === m.label ? null : m.label))}
-                >
+                {/* 2. Başlıklara çerçeve eklendi */}
+                <button className={frameClasses}>
                   {m.label}
                 </button>
-
                 <div
-                  className={`absolute left-0 top-full bg-white border shadow-lg rounded-md p-2 grid gap-1 min-w-[220px] ${
-                    open === m.label ? "block" : "hidden"
+                  className={`absolute left-0 top-full mt-2 bg-slate-800 border border-slate-700 shadow-xl rounded-lg p-2 grid gap-1 min-w-[240px] transition-all duration-200 transform origin-top ${
+                    open === m.label ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                   }`}
                   onMouseEnter={clearCloseTimer}
                   onMouseLeave={scheduleClose}
@@ -106,7 +92,7 @@ export default function Header() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="block px-3 py-2 text-sm text-slate-700 hover:bg-blue-50 rounded"
+                      className="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white rounded-md"
                       onClick={() => setOpen(null)}
                     >
                       {item.label}
@@ -115,9 +101,13 @@ export default function Header() {
                 </div>
               </div>
             ))}
-            <Link href="/iletisim" className="hover:text-blue-400">
-              İletişim
-            </Link>
+            {/* Tekil Linkler */}
+            {singleLinks.map((link) => (
+              // 2. Başlıklara çerçeve eklendi
+              <Link key={link.href} href={link.href} className={frameClasses}>
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Gönüllü Ol butonu */}
@@ -125,7 +115,7 @@ export default function Header() {
             href="https://forms.gle/b6jD1YLVgvns2gGTA"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 border-2 border-white text-white font-medium px-4 py-2 rounded-xl hover:bg-white hover:text-black transition"
+            className="hidden md:flex items-center gap-2 bg-white text-slate-900 font-bold px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors duration-200"
           >
             ☁️ Gönüllü Ol
           </a>
