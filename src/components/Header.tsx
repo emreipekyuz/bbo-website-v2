@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
-// Tipler ve Menü Verisi
 type MenuItem = { href: string; label: string };
 type MenuGroup = { label: string; items: MenuItem[] };
 
@@ -13,18 +12,18 @@ const dropdownMenus: MenuGroup[] = [
       { href: "/hakkimizda", label: "Hakkımızda" },
       { href: "/ekibimiz", label: "Ekibimiz" },
       { href: "/is-birliklerimiz", label: "İş Birliklerimiz" },
-      { href: "/politika-belgelerimiz", label: "Politika Belgelerimiz" }, // ✅ yeni eklendi
+      { href: "/politika-belgelerimiz", label: "Politika Belgelerimiz" },
       { href: "/tarihce", label: "Tarihçe" },
     ],
   },
   {
-    label: "Programlar", // ✅ Komiteler yerine Programlar
+    label: "Programlar",
     items: [
-      { href: "/programlar/nilufer-genclik-programi", label: "Nilüfer Gençlik Programı" }, // ✅ ekstra eklendi
+      { href: "/programlar/nilufer-genclik-programi", label: "Nilüfer Gençlik Programı" },
       { href: "/programlar/genclik", label: "Gençlik Komitesi" },
       { href: "/programlar/kultur-sanat", label: "Kültür-Sanat Komitesi" },
       { href: "/programlar/esitlik", label: "Eşitlik Komitesi" },
-      { href: "/programlar/sosyal-etki", label: "Sosyal Etki Komitesi" }, // ✅ güncellendi
+      { href: "/programlar/sosyal-etki", label: "Sosyal Etki Komitesi" },
     ],
   },
 ];
@@ -35,13 +34,12 @@ const singleLinks: MenuItem[] = [
 ];
 
 export default function Header() {
-  const [openDesktop, setOpenDesktop] = useState<string | null>(null); // desktop hover
-  const [mobileOpen, setMobileOpen] = useState(false); // hamburger paneli
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({}); // mobil akordeon
+  const [openDesktop, setOpenDesktop] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
 
-  // dışarı tıklayınca mobil paneli kapat
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (mobileOpen && panelRef.current && !panelRef.current.contains(e.target as Node)) {
@@ -68,7 +66,7 @@ export default function Header() {
   };
 
   const frameClasses =
-    "px-3 py-1.5 rounded-md text-sm font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors duration-200";
+    "px-3 py-1.5 rounded-md text-sm font-medium text-white hover:bg-gray-700 hover:text-white transition-colors duration-200";
 
   const toggleGroup = (label: string) =>
     setExpanded((p) => ({ ...p, [label]: !p[label] }));
@@ -79,12 +77,12 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-slate-900 shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+    <header className="bg-black shadow-lg sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-white text-lg"
+          className="flex items-center gap-2 font-bold text-white text-xl"
           onClick={closeAll}
         >
           Bir Bulut Olsam Derneği
@@ -92,8 +90,7 @@ export default function Header() {
 
         {/* Desktop NAV */}
         <div className="hidden md:flex items-center gap-6">
-          <nav className="flex items-center gap-2 relative" aria-label="Ana menü">
-            {/* Açılır Menüler (Desktop: hover) */}
+          <nav className="flex items-center gap-4 relative" aria-label="Ana menü">
             {dropdownMenus.map((m) => (
               <div
                 key={m.label}
@@ -109,7 +106,7 @@ export default function Header() {
                   {m.label}
                 </button>
                 <div
-                  className={`absolute left-0 top-full mt-2 bg-slate-800 border border-slate-700 shadow-xl rounded-lg p-2 grid gap-1 min-w-[240px] transition-all duration-200 transform origin-top ${
+                  className={`absolute left-0 top-full mt-2 bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-2 grid gap-1 min-w-[200px] transition-all duration-200 transform origin-top z-20 ${
                     openDesktop === m.label
                       ? "opacity-100 scale-100"
                       : "opacity-0 scale-95 pointer-events-none"
@@ -122,7 +119,7 @@ export default function Header() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="block px-4 py-2 text-sm text-slate-200 hover:bg-slate-700 hover:text-white rounded-md"
+                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-white rounded-md"
                       onClick={closeAll}
                       role="menuitem"
                     >
@@ -133,7 +130,6 @@ export default function Header() {
               </div>
             ))}
 
-            {/* Tekil Linkler */}
             {singleLinks.map((link) => (
               <Link
                 key={link.href}
@@ -146,26 +142,25 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Gönüllü Ol (Desktop) */}
+          {/* Gönüllü Ol ☁️ (Desktop) */}
           <a
             href="https://forms.gle/9JuQ1o751rbpXrxE8"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-2 bg-white text-slate-900 font-bold px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors duration-200"
+            className="hidden md:flex items-center gap-2 bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-200"
           >
-            ☁️ Gönüllü Ol
+            Gönüllü Ol ☁️
           </a>
         </div>
 
         {/* Hamburger (Mobile) */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-slate-200 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-white"
+          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
           aria-label="Menüyü aç/kapat"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((s) => !s)}
         >
-          {/* ikon */}
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-white">
             {mobileOpen ? (
               <path strokeWidth="2" strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -176,84 +171,75 @@ export default function Header() {
       </div>
 
       {/* Mobile Panel */}
-      <div
-        ref={panelRef}
-        className={`md:hidden bg-slate-900 border-t border-slate-800 transition-[max-height,opacity] duration-200 overflow-hidden ${
-          mobileOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
-        }`}
-        aria-hidden={!mobileOpen}
-      >
-        <nav className="px-4 py-3 space-y-2" aria-label="Mobil menü">
-          {/* Grup başlıkları akordeon */}
-          {dropdownMenus.map((g) => {
-            const isOpen = !!expanded[g.label];
-            return (
-              <div key={g.label} className="border border-slate-800 rounded-lg">
-                <button
-                  className="w-full flex items-center justify-between px-4 py-3 text-slate-200"
-                  onClick={() => toggleGroup(g.label)}
-                  aria-expanded={isOpen}
-                  aria-controls={`section-${g.label}`}
-                >
-                  <span className="text-sm font-medium">{g.label}</span>
-                  <svg
-                    className={`h-5 w-5 transition-transform ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
+      {mobileOpen && (
+        <div
+          ref={panelRef}
+          className="md:hidden bg-black border-t border-gray-800 transition-all duration-200"
+        >
+          <nav className="px-4 py-3 space-y-2" aria-label="Mobil menü">
+            {dropdownMenus.map((g) => {
+              const isOpen = !!expanded[g.label];
+              return (
+                <div key={g.label} className="border border-gray-800 rounded-lg">
+                  <button
+                    className="w-full flex items-center justify-between px-4 py-3 text-white"
+                    onClick={() => toggleGroup(g.label)}
+                    aria-expanded={isOpen}
+                    aria-controls={`section-${g.label}`}
                   >
-                    <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
-                  </svg>
-                </button>
-                <div
-                  id={`section-${g.label}`}
-                  className={`grid gap-1 px-2 pb-2 transition-[max-height] duration-200 overflow-hidden ${
-                    isOpen ? "max-h-96" : "max-h-0"
-                  }`}
-                >
-                  {g.items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="block px-3 py-2 text-sm text-slate-200 hover:bg-slate-800 rounded-md"
-                      onClick={() => setMobileOpen(false)}
+                    <span className="text-sm font-medium">{g.label}</span>
+                    <svg
+                      className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
                     >
-                      {item.label}
-                    </Link>
-                  ))}
+                      <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
+                    </svg>
+                  </button>
+                  <div
+                    id={`section-${g.label}`}
+                    className={`grid gap-1 px-2 pb-2 transition-[max-height] duration-200 overflow-hidden ${
+                      isOpen ? "max-h-60" : "max-h-0"
+                    }`}
+                  >
+                    {g.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
-          {/* Tekil linkler */}
-          <div className="grid gap-2">
             {singleLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-3 text-sm font-medium text-slate-200 rounded-md border border-slate-800 hover:bg-slate-800"
+                className="block px-4 py-2 text-sm text-white border border-gray-800 hover:bg-gray-700 rounded-md"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-          </div>
 
-          {/* Gönüllü Ol (Mobile) */}
-          <a
-            href="https://forms.gle/9JuQ1o751rbpXrxE8"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex w-full items-center justify-center bg-white text-slate-900 font-bold px-4 py-3 rounded-lg hover:bg-slate-200"
-            onClick={() => setMobileOpen(false)}
-          >
-            ☁️ Gönüllü Ol
-          </a>
-        </nav>
-      </div>
+            <a
+              href="https://forms.gle/9JuQ1o751rbpXrxE8"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 block w-full text-center bg-white text-black font-bold px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+            >
+              Gönüllü Ol ☁️
+            </a>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

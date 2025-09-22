@@ -1,124 +1,142 @@
 "use client";
-
-import Script from "next/script"; // Instagram eklentisi için gerekli
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function HomePage() {
   return (
-    <div>
-      {/* 1. YENİ HERO BÖLÜMÜ */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center text-white text-center">
-        {/* Arka Plan Fotoğrafı */}
-        <div className="absolute inset-0">
-          <img
-            src="/images/hero-background.jpg" // <-- KENDİ FOTOĞRAFINIZIN YOLUNU BURAYA YAZIN
-            alt="Dernek faaliyeti"
-            className="w-full h-full object-cover"
-          />
-          {/* Fotoğrafın üzerine metnin okunması için hafif karartma efekti */}
-          <div className="absolute inset-0 bg-black opacity-50"></div>
-        </div>
+    <div className="bg-black text-white min-h-screen">
+      {/* Hero */}
+      <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Arkadaki bulut animasyonları */}
+        <motion.div
+          className="absolute top-20 left-[-200px] w-96 h-48 bg-white/10 rounded-full blur-3xl"
+          animate={{ x: [0, 150, 0] }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-[-200px] w-96 h-48 bg-white/10 rounded-full blur-3xl"
+          animate={{ x: [0, -150, 0] }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+        />
 
-        {/* Hero İçeriği */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-            Bir Bulut Olsam Derneği
-          </h1>
-          <p className="mt-6 text-lg md:text-xl text-gray-200">
-            Gençlerle birlikte üretim, eşitlik ve sosyal etki için çalışıyoruz.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <a
-              href="/programlar"
-              className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition"
+        <h1 className="text-5xl md:text-7xl font-extrabold text-center mb-6 relative z-10">
+          Bulutların Ötesinde <br /> Gençlik Hareketi
+        </h1>
+        <p className="text-gray-300 text-lg md:text-xl max-w-2xl text-center relative z-10">
+          Bir Bulut Olsam Derneği, gençlerin kurduğu ve gençlerle yönettiği
+          sosyal girişim derneğidir.
+        </p>
+      </section>
+
+      {/* Programlar */}
+      <section className="py-20 bg-gray-900">
+        <h2 className="text-4xl font-bold text-center mb-12">Programlar</h2>
+        <div className="flex flex-wrap justify-center gap-12">
+          {[
+            "Nilüfer Gençlik Programı",
+            "Gençlik Komitesi",
+            "Kültür-Sanat Komitesi",
+            "Eşitlik Komitesi",
+            "Sosyal Etki Komitesi",
+          ].map((program) => (
+            <motion.div
+              key={program}
+              className="w-40 h-40 rounded-full bg-gray-800 flex items-center justify-center text-center p-6 shadow-lg hover:bg-gray-700 cursor-pointer"
+              whileHover={{ scale: 1.1 }}
             >
-              Programlarımız
-            </a>
-            <a
-              href="/gonullu-ol"
-              className="px-8 py-3 border-2 border-white font-semibold rounded-lg hover:bg-white hover:text-blue-600 transition"
-            >
-              Gönüllü Ol
-            </a>
-          </div>
+              <span className="text-white font-semibold text-sm">{program}</span>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* 2. HAKKIMIZDA VE ETKİ ALANI */}
-      <section className="bg-white py-20 text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Bir Fikirden Topluluğa
-          </h2>
-          <p className="mt-4 text-lg text-gray-600">
-            Misyonumuz, gençlerin potansiyelini ortaya çıkararak toplumsal
-            değişime öncülük etmelerini sağlamaktır. Bugüne kadar 
-            <span className="font-bold text-blue-600"> 10.000'den fazla gence</span> ulaştık ve 
-            <span className="font-bold text-blue-600"> 200'den fazla gönüllümüzle</span> 
-            birlikte nice projeye imza attık.
-          </p>
+      {/* Öne Çıkan Projeler */}
+      <section className="py-20 bg-black">
+        <h2 className="text-4xl font-bold text-center mb-12">Öne Çıkan Projeler</h2>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-10">
+          {["Proje A", "Proje B", "Proje C", "Proje D"].map((p, i) => (
+            <motion.div
+              key={p}
+              className="relative flex flex-col items-center"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.2 }}
+            >
+              <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                ☁️
+              </div>
+              <h3 className="mt-4 text-lg font-semibold">{p}</h3>
+              <p className="text-gray-400 text-sm max-w-xs text-center">
+                Kısa açıklama burada olacak. Projenin amacı, hedefi ve çıktıları özetlenebilir.
+              </p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* 3. INSTAGRAM GALERİ BÖLÜMÜ */}
-      <section className="bg-slate-50 py-20">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-800">
-            Yaptıklarımızdan Bazıları
-          </h2>
-          <p className="mt-4 mb-12 text-lg text-gray-600">
-            En güncel etkinlik ve duyurularımız için sosyal medyamızı takip edin.
-          </p>
-          
-          {/* Elfsight Instagram Kodu */}
-          <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />
-          <div
-            className="elfsight-app-f30e60bc-0597-44b0-83f3-9451052c1448"
-            data-elfsight-app-lazy
-          ></div>
-        </div>
-      </section>
+      {/* Blog + En Altta Gönüllü Ol */}
+      <section className="py-32 bg-gradient-to-r from-gray-900 to-black text-white text-center relative overflow-hidden">
+        <motion.div
+          className="absolute -top-20 left-0 w-full h-40 bg-white/10 blur-3xl"
+          animate={{ opacity: [0.6, 0.8, 0.6] }}
+          transition={{ duration: 6, repeat: Infinity }}
+        />
 
-      {/* 4. CTA KARTLARI (Tasarımı aynı, üst boşluk ayarlandı) */}
-      <section className="bg-white py-20">
-        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
-          {/* Kartlar burada (değişiklik yok) */}
-          <div className="p-6 border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-transform">
-            <h3 className="text-xl font-bold text-blue-600">Bizi Tanıyın</h3>
-            <p className="mt-2 text-slate-600">
-              Derneğimizin misyonu, vizyonu ve hikayesini keşfedin.
-            </p>
-            <a
-              href="/hakkimizda"
-              className="mt-4 inline-block text-blue-600 font-semibold hover:underline"
-            >
-              Daha Fazla →
-            </a>
-          </div>
-          <div className="p-6 border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-transform">
-            <h3 className="text-xl font-bold text-blue-600">Gönüllümüz Olun</h3>
-            <p className="mt-2 text-slate-600">
-              Gençlerle birlikte üretim yapın, toplumsal etki yaratın.
-            </p>
-            <a
-              href="/gonullu-ol"
-              className="mt-4 inline-block text-blue-600 font-semibold hover:underline"
-            >
-              Başvur →
-            </a>
-          </div>
-          <div className="p-6 border rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-transform">
-            <h3 className="text-xl font-bold text-blue-600">Topluluk Merkezleri</h3>
-            <p className="mt-2 text-slate-600">
-              Yerelde yürüttüğümüz gençlik merkezlerimizi tanıyın.
-            </p>
-            <a
-              href="/merkezler"
-              className="mt-4 inline-block text-blue-600 font-semibold hover:underline"
-            >
-              Keşfet →
-            </a>
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-10 relative z-10">
+          Blog
+        </h2>
+
+        {/* Blog Carousel */}
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
+            {[
+              {
+                title: "Blog Yazısı 1",
+                excerpt: "Gençlerle dayanışma üzerine...",
+              },
+              {
+                title: "Blog Yazısı 2",
+                excerpt: "Nilüfer’de gençlik hareketleri...",
+              },
+              {
+                title: "Blog Yazısı 3",
+                excerpt: "Bir Bulut Olsam’dan proje notları...",
+              },
+              {
+                title: "Blog Yazısı 4",
+                excerpt: "Avrupa’daki gençlik programları...",
+              },
+            ].map((post, i) => (
+              <motion.div
+                key={i}
+                className="min-w-[280px] max-w-[300px] bg-white rounded-xl shadow-lg p-6 text-left snap-center hover:shadow-xl transition-shadow"
+                whileHover={{ scale: 1.05 }}
+              >
+                <h3 className="text-lg font-bold text-sky-700 mb-2">{post.title}</h3>
+                <p className="text-slate-600 text-sm mb-4">{post.excerpt}</p>
+                <Link
+                  href="/blog"
+                  className="text-sky-600 hover:underline text-sm font-medium"
+                >
+                  Devamını Oku →
+                </Link>
+              </motion.div>
+            ))}
           </div>
         </div>
+
+        {/* En Altta CTA */}
+        <a
+          href="https://forms.gle/9JuQ1o751rbpXrxE8"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-16 inline-flex items-center px-10 py-5 bg-white text-black font-bold rounded-full shadow-lg hover:bg-gray-200 transition-colors text-lg relative z-10"
+        >
+          Gönüllü Ol ☁️
+        </a>
+        <p className="text-lg md:text-xl font-medium text-white relative z-10 mt-6">
+          Gençlerle Birlikte Gökyüzüne ☁️
+        </p>
       </section>
     </div>
   );
