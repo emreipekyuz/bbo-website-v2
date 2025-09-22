@@ -13,16 +13,18 @@ const dropdownMenus: MenuGroup[] = [
       { href: "/hakkimizda", label: "Hakkımızda" },
       { href: "/ekibimiz", label: "Ekibimiz" },
       { href: "/is-birliklerimiz", label: "İş Birliklerimiz" },
+      { href: "/politika-belgelerimiz", label: "Politika Belgelerimiz" }, // ✅ yeni eklendi
       { href: "/tarihce", label: "Tarihçe" },
     ],
   },
   {
-    label: "Komiteler",
+    label: "Programlar", // ✅ Komiteler yerine Programlar
     items: [
-      { href: "/komiteler/genclik", label: "Gençlik Komitesi" },
-      { href: "/komiteler/kultur-sanat", label: "Kültür-Sanat Komitesi" },
-      { href: "/komiteler/esitlik", label: "Eşitlik Komitesi" },
-      { href: "/komiteler/sosyal-sorumluluk", label: "Sosyal Sorumluluk Komitesi" },
+      { href: "/programlar/nilufer-genclik-programi", label: "Nilüfer Gençlik Programı" }, // ✅ ekstra eklendi
+      { href: "/programlar/genclik", label: "Gençlik Komitesi" },
+      { href: "/programlar/kultur-sanat", label: "Kültür-Sanat Komitesi" },
+      { href: "/programlar/esitlik", label: "Eşitlik Komitesi" },
+      { href: "/programlar/sosyal-etki", label: "Sosyal Etki Komitesi" }, // ✅ güncellendi
     ],
   },
 ];
@@ -90,10 +92,7 @@ export default function Header() {
 
         {/* Desktop NAV */}
         <div className="hidden md:flex items-center gap-6">
-          <nav
-            className="flex items-center gap-2 relative"
-            aria-label="Ana menü"
-          >
+          <nav className="flex items-center gap-2 relative" aria-label="Ana menü">
             {/* Açılır Menüler (Desktop: hover) */}
             {dropdownMenus.map((m) => (
               <div
@@ -149,7 +148,7 @@ export default function Header() {
 
           {/* Gönüllü Ol (Desktop) */}
           <a
-            href="https://forms.gle/b6jD1YLVgvns2gGTA"
+            href="https://forms.gle/9JuQ1o751rbpXrxE8"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-2 bg-white text-slate-900 font-bold px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors duration-200"
@@ -166,12 +165,7 @@ export default function Header() {
           onClick={() => setMobileOpen((s) => !s)}
         >
           {/* ikon */}
-          <svg
-            className="h-6 w-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-          >
+          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             {mobileOpen ? (
               <path strokeWidth="2" strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -250,7 +244,7 @@ export default function Header() {
 
           {/* Gönüllü Ol (Mobile) */}
           <a
-            href="https://forms.gle/b6jD1YLVgvns2gGTA"
+            href="https://forms.gle/9JuQ1o751rbpXrxE8"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-2 inline-flex w-full items-center justify-center bg-white text-slate-900 font-bold px-4 py-3 rounded-lg hover:bg-slate-200"
