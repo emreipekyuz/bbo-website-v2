@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Vercel için output: "export" kaldırıldı → SSR/dinamik rotalar da çalışır
+  // ⚠️ Statik export kaldırıldı çünkü /studio gibi dinamik rotalar desteklenmiyor.
+  // output: "export",
 
   eslint: {
     // ESLint hataları build'i durdurmasın
@@ -13,7 +14,7 @@ const nextConfig = {
   },
 
   images: {
-    // Vercel kendi optimize eder, istersen unoptimized:true bırakabilirsin
+    // Vercel kendi optimize eder
     remotePatterns: [
       {
         protocol: "https",
