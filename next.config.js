@@ -1,17 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export",
+  // Vercel için output: "export" kaldırıldı → SSR/dinamik rotalar da çalışır
 
-  // ESLint hataları build'i durdurmasın
-  eslint: { ignoreDuringBuilds: true },
+  eslint: {
+    // ESLint hataları build'i durdurmasın
+    ignoreDuringBuilds: true,
+  },
 
-  // TypeScript hataları build'i durdurmasın
-  typescript: { ignoreBuildErrors: true },
+  typescript: {
+    // TypeScript hataları build'i durdurmasın
+    ignoreBuildErrors: true,
+  },
 
   images: {
-    unoptimized: true,
+    // Vercel kendi optimize eder, istersen unoptimized:true bırakabilirsin
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.sanity.io" },
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
     ],
   },
 };
