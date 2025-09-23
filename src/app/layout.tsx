@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.birbulutolsamdernegi.org"),  // 🔹 Domaini buraya ekledim
+  metadataBase: new URL("https://www.birbulutolsamdernegi.org"),  // ✅ kendi domain
   title: "Bir Bulut Olsam Derneği",
   description:
     "Gençlerin kurduğu ve gençlerle birlikte yönettiği sosyal girişim derneği.",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "Bir Bulut Olsam",
     images: [
       {
-        url: "/logo.png",     // public/logo.png
+        url: "/logo2.png",   // ✅ yeni logon
         width: 600,
         height: 600,
         alt: "Bir Bulut Olsam Derneği Logo",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: "Bir Bulut Olsam Derneği",
     description:
       "Gençlerin kurduğu ve gençlerle birlikte yönettiği sosyal girişim derneği.",
-    images: ["/logo.png"],
+    images: ["/logo2.png"],  // ✅ Twitter için de yeni logo
   },
 };
 
