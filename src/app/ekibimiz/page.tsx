@@ -14,7 +14,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 export default function EkibimizPage() {
-  const IMG = "/team/melsa-bedir.png"; // 🔹 Tüm kartlarda kullanılacak ortak görsel
+  const IMG = "/team/melsa-bedir.jpg"; // 🔹 jpg olarak güncellendi
 
   return (
     <div className="bg-[#0e0f12] text-white">
