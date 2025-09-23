@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type MenuItem = { href: string; label: string };
 type MenuGroup = { label: string; items: MenuItem[] };
@@ -40,6 +40,7 @@ export default function Header() {
   const closeTimer = useRef<NodeJS.Timeout | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
 
+  // Dışarı tıklayınca mobil paneli kapat
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (mobileOpen && panelRef.current && !panelRef.current.contains(e.target as Node)) {
@@ -77,7 +78,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-black shadow-lg sticky top-0 z-50">
+    <header className="bg-black shadow-lg sticky top-0 z-[60]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -106,7 +107,7 @@ export default function Header() {
                   {m.label}
                 </button>
                 <div
-                  className={`absolute left-0 top-full mt-2 bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-2 grid gap-1 min-w-[200px] transition-all duration-200 transform origin-top z-20 ${
+                  className={`absolute left-0 top-full mt-2 bg-gray-900 border border-gray-800 shadow-xl rounded-lg p-2 grid gap-1 min-w-[220px] transition-all duration-200 transform origin-top z-50 ${
                     openDesktop === m.label
                       ? "opacity-100 scale-100"
                       : "opacity-0 scale-95 pointer-events-none"
@@ -119,7 +120,7 @@ export default function Header() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:text-white rounded-md"
+                      className="block px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-md"
                       onClick={closeAll}
                       role="menuitem"
                     >
@@ -142,25 +143,25 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Gönüllü Ol ☁️ (Desktop) */}
+          {/* Gönüllü Ol (Desktop) */}
           <a
             href="https://forms.gle/9JuQ1o751rbpXrxE8"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-2 bg-white text-black font-bold px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-200"
           >
-            Gönüllü Ol ☁️
+            ☁️ Gönüllü Ol
           </a>
         </div>
 
         {/* Hamburger (Mobile) */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-white"
+          className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-white"
           aria-label="Menüyü aç/kapat"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((s) => !s)}
         >
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-white">
+          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             {mobileOpen ? (
               <path strokeWidth="2" strokeLinecap="round" d="M6 18L18 6M6 6l12 12" />
             ) : (
@@ -170,76 +171,84 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Mobile Panel */}
-      {mobileOpen && (
-        <div
-          ref={panelRef}
-          className="md:hidden bg-black border-t border-gray-800 transition-all duration-200"
-        >
-          <nav className="px-4 py-3 space-y-2" aria-label="Mobil menü">
-            {dropdownMenus.map((g) => {
-              const isOpen = !!expanded[g.label];
-              return (
-                <div key={g.label} className="border border-gray-800 rounded-lg">
-                  <button
-                    className="w-full flex items-center justify-between px-4 py-3 text-white"
-                    onClick={() => toggleGroup(g.label)}
-                    aria-expanded={isOpen}
-                    aria-controls={`section-${g.label}`}
+      {/* Mobile Panel (tam genişlik, üstte görünür) */}
+      <div
+        ref={panelRef}
+        className={`md:hidden absolute left-0 right-0 top-full bg-black border-t border-gray-800 transition-[max-height,opacity] duration-200 overflow-hidden z-[55] ${
+          mobileOpen ? "max-h-[85vh] opacity-100" : "max-h-0 opacity-0"
+        }`}
+        aria-hidden={!mobileOpen}
+      >
+        <nav className="px-4 py-3 space-y-3" aria-label="Mobil menü">
+          {dropdownMenus.map((g) => {
+            const isOpen = !!expanded[g.label];
+            return (
+              <div key={g.label} className="rounded-lg border border-gray-800">
+                <button
+                  className="w-full flex items-center justify-between px-4 py-3 text-white"
+                  onClick={() => toggleGroup(g.label)}
+                  aria-expanded={isOpen}
+                  aria-controls={`section-${g.label}`}
+                >
+                  <span className="text-sm font-medium">{g.label}</span>
+                  <svg
+                    className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
                   >
-                    <span className="text-sm font-medium">{g.label}</span>
-                    <svg
-                      className={`h-5 w-5 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
+                    <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+                <div
+                  id={`section-${g.label}`}
+                  className={`grid gap-1 px-2 pb-2 transition-[max-height] duration-200 overflow-hidden ${
+                    isOpen ? "max-h-64" : "max-h-0"
+                  }`}
+                >
+                  {g.items.map((item, idx) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`block px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-md ${
+                        idx < g.items.length - 1 ? "border-b border-gray-800" : ""
+                      }`}
+                      onClick={() => setMobileOpen(false)}
                     >
-                      <path strokeWidth="2" strokeLinecap="round" d="M6 9l6 6 6-6" />
-                    </svg>
-                  </button>
-                  <div
-                    id={`section-${g.label}`}
-                    className={`grid gap-1 px-2 pb-2 transition-[max-height] duration-200 overflow-hidden ${
-                      isOpen ? "max-h-60" : "max-h-0"
-                    }`}
-                  >
-                    {g.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="block px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
+                      {item.label}
+                    </Link>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            );
+          })}
 
+          {/* Tekil linkler */}
+          <div className="grid gap-2">
             {singleLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-2 text-sm text-white border border-gray-800 hover:bg-gray-700 rounded-md"
+                className="block px-4 py-3 text-sm font-medium text-white rounded-md border border-gray-800 hover:bg-gray-800"
                 onClick={() => setMobileOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
+          </div>
 
-            <a
-              href="https://forms.gle/9JuQ1o751rbpXrxE8"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 block w-full text-center bg-white text-black font-bold px-4 py-3 rounded-lg hover:bg-gray-200 transition-colors duration-200"
-            >
-              Gönüllü Ol ☁️
-            </a>
-          </nav>
-        </div>
-      )}
+          {/* Gönüllü Ol (Mobile) */}
+          <a
+            href="https://forms.gle/9JuQ1o751rbpXrxE8"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex w-full items-center justify-center bg-white text-black font-bold px-4 py-3 rounded-lg hover:bg-gray-200"
+            onClick={() => setMobileOpen(false)}
+          >
+            ☁️ Gönüllü Ol
+          </a>
+        </nav>
+      </div>
     </header>
   );
 }
