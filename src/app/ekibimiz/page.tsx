@@ -23,15 +23,15 @@ export default function EkibimizPage() {
         <section className="mt-10">
           <SectionTitle>Yönetim Kurulu</SectionTitle>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            <TeamCard name="Emre İpekyüz" role="Yönetim Kurulu Üyesi" src="/team/emre-ipekyuz.jpg" />
-            <TeamCard name="Musa İpekten" role="Yönetim Kurulu Üyesi" src="/team/musa-ipekten.jpg" />
-            <TeamCard name="Yağmur Akın" role="Yönetim Kurulu Üyesi" src="/team/yagmur-akin.jpg" />
-            <TeamCard name="Maysa Ünal" role="Yönetim Kurulu Üyesi" src="/team/maysa-unal.jpg" />
-            <TeamCard name="Nilsu Uysal" role="Yönetim Kurulu Üyesi" src="/team/nilsu-uysal.jpg" />
-            <TeamCard name="Gülsu Erdan" role="Yönetim Kurulu Üyesi" src="/team/gulsu-erdan.jpg" />
+            <TeamCard name="Emre İpekyüz" role="Yönetim Kurulu Başkanı" src="/team/emre-ipekyuz.jpg" />
+            <TeamCard name="Musa İpekten" role="Yönetim Kurulu Başkan Yardımcısı" src="/team/musa-ipekten.jpg" />
+            <TeamCard name="Yağmur Akın" role="Yönetim Kurulu Genel Sekreteri" src="/team/yagmur-akin.jpg" />
+            <TeamCard name="Nilsu Uysal" role="Yönetim Kurulu Saymanı" src="/team/nilsu-uysal.jpg" />
             <TeamCard name="Aleyna Koldaş" role="Yönetim Kurulu Üyesi" src="/team/aleyna-koldas.jpg" />
-            <TeamCard name="Zeynep İshakoğlu" role="Yönetim Kurulu Üyesi" src="/team/zeynep-ishakoglu.jpg" />
+            <TeamCard name="Gülsu Erdan" role="Yönetim Kurulu Üyesi" src="/team/gulsu-erdan.jpg" />
+            <TeamCard name="Maysa Ünal" role="Yönetim Kurulu Üyesi" src="/team/maysa-unal.jpg" />
             <TeamCard name="Gülbahar Yüceyüksel" role="Yönetim Kurulu Üyesi" src="/team/gulbahar-yuceyuksel.jpg" />
+            <TeamCard name="Zeynep İshakoğlu" role="Yönetim Kurulu Üyesi" src="/team/zeynep-ishakoglu.jpg" />
             <TeamCard name="Zeynep Sunay" role="Yönetim Kurulu Üyesi" src="/team/zeynep-sunay.jpg" />
           </div>
         </section>
@@ -87,5 +87,3 @@ export default function EkibimizPage() {
     </div>
   );
 }
-
-
