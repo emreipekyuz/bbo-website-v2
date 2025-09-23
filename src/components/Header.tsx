@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type MenuItem = { href: string; label: string };
@@ -80,12 +81,21 @@ export default function Header() {
   return (
     <header className="bg-black shadow-lg sticky top-0 z-[60]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        {/* Logo */}
+        {/* Logo + Yazı */}
         <Link
           href="/"
-          className="flex items-center gap-2 font-bold text-white text-xl"
+          className="flex items-center gap-3 font-bold text-white text-xl"
           onClick={closeAll}
         >
+          {/* Logonuzu public/logo.png içine koyun */}
+          <Image
+            src="/logo.png"
+            alt="Bir Bulut Olsam Derneği Logo"
+            width={40}
+            height={40}
+            className="rounded-full"
+            priority
+          />
           Bir Bulut Olsam Derneği
         </Link>
 
@@ -186,7 +196,7 @@ export default function Header() {
               <div key={g.label} className="rounded-lg border border-gray-800">
                 <button
                   className="w-full flex items-center justify-between px-4 py-3 text-white"
-                  onClick={() => toggleGroup(g.label)}
+                  onClick={() => setExpanded((p) => ({ ...p, [g.label]: !p[g.label] }))}
                   aria-expanded={isOpen}
                   aria-controls={`section-${g.label}`}
                 >
