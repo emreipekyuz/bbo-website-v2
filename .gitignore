@@ -40,3 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 public/gallery/*.mp4
+public/gallery/*.mp4
