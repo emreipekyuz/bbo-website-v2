@@ -1,41 +1,28 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-type MediaItem =
-  | { type: "photo"; src: string; thumb?: string; alt?: string }
-  | { type: "video"; src: string; thumb?: string; poster?: string; alt?: string };
+// Sade tip: sadece foto
+type PhotoItem = { src: string; thumb?: string; alt?: string };
 
 export default function HomePage() {
   // ---- GALERİ VERİSİ ----
   // /public/gallery/... altına dosyaları koy
-  const photos: MediaItem[] = useMemo(
+  const photos: PhotoItem[] = useMemo(
     () => [
-      { type: "photo", src: "/gallery/photo-1.jpg", alt: "Etkinlik 1" },
-      { type: "photo", src: "/gallery/photo-2.jpg", alt: "Atölye 2" },
-      { type: "photo", src: "/gallery/photo-3.jpg", alt: "Saha Çalışması" },
-      { type: "photo", src: "/gallery/photo-4.jpg", alt: "Gönüllüler" },
-      { type: "photo", src: "/gallery/photo-5.jpg", alt: "Toplantı" },
-      { type: "photo", src: "/gallery/photo-6.jpg", alt: "Sunum" },
+      { src: "/gallery/photo-1.jpg", alt: "Etkinlik 1" },
+      { src: "/gallery/photo-2.jpg", alt: "Atölye 2" },
+      { src: "/gallery/photo-3.jpg", alt: "Saha Çalışması" },
+      { src: "/gallery/photo-4.jpg", alt: "Gönüllüler" },
+      { src: "/gallery/photo-5.jpg", alt: "Toplantı" },
+      { src: "/gallery/photo-6.jpg", alt: "Sunum" },
     ],
     []
   );
 
-  const videos: MediaItem[] = useMemo(
-    () => [
-      // thumb veya poster eklersen grid’de hızlı yüklenir
-      { type: "video", src: "/gallery/video-1.mp4", poster: "/gallery/video-1.jpg", alt: "Tanıtım Videosu" },
-      { type: "video", src: "/gallery/video-2.mp4", poster: "/gallery/video-2.jpg", alt: "Proje Özeti" },
-    ],
-    []
-  );
-
-  // ---- GALERİ STATE ----
-  const [tab, setTab] = useState<"photos" | "videos">("photos");
-  const list = tab === "photos" ? photos : videos;
-
+  // ---- LIGHTBOX / NAV STATE ----
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -44,8 +31,8 @@ export default function HomePage() {
     setLightboxOpen(true);
   };
   const closeLightbox = () => setLightboxOpen(false);
-  const prev = () => setCurrentIndex((i) => (i - 1 + list.length) % list.length);
-  const next = () => setCurrentIndex((i) => (i + 1) % list.length);
+  const prev = () => setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
+  const next = () => setCurrentIndex((i) => (i + 1) % photos.length);
 
   // Klavye kısayolları
   useEffect(() => {
@@ -57,9 +44,19 @@ export default function HomePage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [lightboxOpen, list.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxOpen, photos.length]);
 
-  const currentItem = list[currentIndex];
+  const currentItem = photos[currentIndex];
+
+  // ---- KAYDIRMALI GALERİ (scroll-snap) ----
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const scrollByAmount = (dir: "left" | "right") => {
+    const el = trackRef.current;
+    if (!el) return;
+    const amt = Math.round(el.clientWidth * 0.9);
+    el.scrollBy({ left: dir === "left" ? -amt : amt, behavior: "smooth" });
+  };
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -107,73 +104,75 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---- GALERİ (Öne Çıkan Projeler yerine) ---- */}
+      {/* ---- FOTO GALERİ (KAYDIRMALI) ---- */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between gap-4 mb-8">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-4xl font-bold">Galeri</h2>
-            <div className="inline-flex rounded-lg border border-white/10 overflow-hidden">
+
+            {/* Kaydırma okları */}
+            <div className="hidden md:flex items-center gap-2">
               <button
-                className={`px-4 py-2 text-sm font-medium ${
-                  tab === "photos" ? "bg-white text-black" : "bg-transparent text-white hover:bg-white/10"
-                }`}
-                onClick={() => setTab("photos")}
+                onClick={() => scrollByAmount("left")}
+                className="p-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/10"
+                aria-label="Sola kaydır"
               >
-                Fotoğraflar
+                <svg width="22" height="22" viewBox="0 0 24 24" stroke="white" fill="none">
+                  <path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
               <button
-                className={`px-4 py-2 text-sm font-medium border-l border-white/10 ${
-                  tab === "videos" ? "bg-white text-black" : "bg-transparent text-white hover:bg-white/10"
-                }`}
-                onClick={() => setTab("videos")}
+                onClick={() => scrollByAmount("right")}
+                className="p-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/10"
+                aria-label="Sağa kaydır"
               >
-                Videolar
+                <svg width="22" height="22" viewBox="0 0 24 24" stroke="white" fill="none">
+                  <path d="M9 6l6 6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
             </div>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {list.map((item, idx) => {
-              const thumb = item.thumb ?? (item.type === "photo" ? item.src : item.poster ?? item.src);
-              return (
-                <button
-                  key={idx}
-                  onClick={() => openLightbox(idx)}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-400"
-                  aria-label={item.alt ?? (item.type === "photo" ? "Fotoğraf" : "Video")}
-                >
-                  {/* Thumbnail */}
-                  {item.type === "photo" ? (
+          {/* Kenar parıltıları */}
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent" />
+
+            {/* Track */}
+            <div
+              ref={trackRef}
+              className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-white/20"
+            >
+              {photos.map((item, idx) => {
+                const thumb = item.thumb ?? item.src;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => openLightbox(idx)}
+                    className="relative snap-center shrink-0 w-[80vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw] aspect-[4/3] rounded-xl overflow-hidden border border-white/10 group focus:outline-none focus:ring-2 focus:ring-sky-400"
+                    aria-label={item.alt ?? "Fotoğraf"}
+                  >
                     <Image
                       src={thumb}
                       alt={item.alt ?? "Fotoğraf"}
                       fill
-                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      sizes="(max-width: 640px) 80vw, (max-width: 768px) 55vw, (max-width: 1024px) 40vw, 28vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      priority={idx < 2}
                     />
-                  ) : (
-                    <>
-                      <Image
-                        src={thumb}
-                        alt={item.alt ?? "Video"}
-                        fill
-                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        className="object-cover opacity-90"
-                      />
-                      {/* Play ikon */}
-                      <div className="absolute inset-0 grid place-items-center">
-                        <div className="w-12 h-12 rounded-full bg-black/70 border border-white/20 flex items-center justify-center">
-                          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
+                    {/* altta mini caption şeridi */}
+                    {item.alt && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left">
+                        <span className="text-sm text-white/90">{item.alt}</span>
                       </div>
-                    </>
-                  )}
-                </button>
-              );
-            })}
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Mobil için alt yardım metni */}
+            <p className="mt-3 text-center text-white/60 text-sm md:hidden">Kaydırarak daha fazla fotoğraf gör ✨</p>
           </div>
         </div>
       </section>
@@ -186,30 +185,16 @@ export default function HomePage() {
           transition={{ duration: 6, repeat: Infinity }}
         />
 
-        <h2 className="text-4xl md:text-5xl font-extrabold mb-10 relative z-10">
-          Blog
-        </h2>
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-10 relative z-10">Blog</h2>
 
         {/* Blog Carousel (örnek dummy içerik) */}
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
             {[
-              {
-                title: "Blog Yazısı 1",
-                excerpt: "Gençlerle dayanışma üzerine...",
-              },
-              {
-                title: "Blog Yazısı 2",
-                excerpt: "Nilüfer’de gençlik hareketleri...",
-              },
-              {
-                title: "Blog Yazısı 3",
-                excerpt: "Bir Bulut Olsam’dan proje notları...",
-              },
-              {
-                title: "Blog Yazısı 4",
-                excerpt: "Avrupa’daki gençlik programları...",
-              },
+              { title: "Blog Yazısı 1", excerpt: "Gençlerle dayanışma üzerine..." },
+              { title: "Blog Yazısı 2", excerpt: "Nilüfer’de gençlik hareketleri..." },
+              { title: "Blog Yazısı 3", excerpt: "Bir Bulut Olsam’dan proje notları..." },
+              { title: "Blog Yazısı 4", excerpt: "Avrupa’daki gençlik programları..." },
             ].map((post, i) => (
               <motion.div
                 key={i}
@@ -218,10 +203,7 @@ export default function HomePage() {
               >
                 <h3 className="text-lg font-bold text-sky-700 mb-2">{post.title}</h3>
                 <p className="text-slate-600 text-sm mb-4">{post.excerpt}</p>
-                <Link
-                  href="/blog"
-                  className="text-sky-600 hover:underline text-sm font-medium"
-                >
+                <Link href="/blog" className="text-sky-600 hover:underline text-sm font-medium">
                   Devamını Oku →
                 </Link>
               </motion.div>
@@ -229,7 +211,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* En Altta CTA (sadece burada ve header’da) */}
+        {/* En Altta CTA */}
         <a
           href="https://forms.gle/9JuQ1o751rbpXrxE8"
           target="_blank"
@@ -262,7 +244,7 @@ export default function HomePage() {
           </button>
 
           {/* Önceki */}
-          {list.length > 1 && (
+          {photos.length > 1 && (
             <button
               className="absolute left-2 md:left-6 p-2 rounded-md bg-white/10 hover:bg-white/20"
               onClick={prev}
@@ -277,33 +259,23 @@ export default function HomePage() {
           {/* İçerik */}
           <div className="w-full max-w-5xl">
             <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden border border-white/10">
-              {currentItem.type === "photo" ? (
-                <Image
-                  src={currentItem.src}
-                  alt={currentItem.alt ?? "Fotoğraf"}
-                  fill
-                  sizes="80vw"
-                  className="object-contain"
-                  priority
-                />
-              ) : (
-                <video
-                  src={currentItem.src}
-                  controls
-                  autoPlay
-                  poster={currentItem.poster}
-                  className="w-full h-full object-contain bg-black"
-                />
-              )}
+              <Image
+                src={currentItem.src}
+                alt={currentItem.alt ?? "Fotoğraf"}
+                fill
+                sizes="80vw"
+                className="object-contain"
+                priority
+              />
             </div>
             {/* Sayaç */}
             <div className="text-center text-white/70 text-sm mt-3">
-              {currentIndex + 1} / {list.length}
+              {currentIndex + 1} / {photos.length}
             </div>
           </div>
 
           {/* Sonraki */}
-          {list.length > 1 && (
+          {photos.length > 1 && (
             <button
               className="absolute right-2 md:right-6 p-2 rounded-md bg-white/10 hover:bg-white/20"
               onClick={next}
