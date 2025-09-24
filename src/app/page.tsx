@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-// Sade tip: sadece foto
 type PhotoItem = { src: string; thumb?: string; alt?: string };
 
 export default function HomePage() {
@@ -34,7 +33,7 @@ export default function HomePage() {
   const prev = () => setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
   const next = () => setCurrentIndex((i) => (i + 1) % photos.length);
 
-  // Klavye kısayolları
+  // Klavye kısayolları (lightbox açıkken)
   useEffect(() => {
     if (!lightboxOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -47,16 +46,62 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lightboxOpen, photos.length]);
 
-  const currentItem = photos[currentIndex];
+  // ---- AUTOPLAY ----
+  // Hover/odak/visible durumlarına göre durdur/başlat
+  const [isHoveringCarousel, setIsHoveringCarousel] = useState(false);
+  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prefersNoMotion = useRef<boolean>(false);
 
-  // ---- KAYDIRMALI GALERİ (scroll-snap) ----
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const scrollByAmount = (dir: "left" | "right") => {
-    const el = trackRef.current;
-    if (!el) return;
-    const amt = Math.round(el.clientWidth * 0.9);
-    el.scrollBy({ left: dir === "left" ? -amt : amt, behavior: "smooth" });
+  useEffect(() => {
+    // prefers-reduced-motion desteği
+    if (typeof window !== "undefined") {
+      prefersNoMotion.current =
+        window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+  }, []);
+
+  useEffect(() => {
+    const shouldRun =
+      !lightboxOpen &&
+      !isHoveringCarousel &&
+      !prefersNoMotion.current &&
+      typeof document !== "undefined" &&
+      document.visibilityState === "visible";
+
+    if (shouldRun) {
+      autoplayRef.current = setInterval(() => {
+        setCurrentIndex((i) => (i + 1) % photos.length);
+      }, 3500);
+    }
+
+    return () => {
+      if (autoplayRef.current) clearInterval(autoplayRef.current);
+      autoplayRef.current = null;
+    };
+  }, [lightboxOpen, isHoveringCarousel, photos.length]);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      // görünürlük değişince autoplay efektinde effect tetiklensin
+      setIsHoveringCarousel((h) => h);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  // ---- SWIPE (mobil) basitçe: dokun sürükle ile next/prev ----
+  const touchStartX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => (touchStartX.current = e.touches[0].clientX);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 30) return; // küçük hareketleri yok say
+    if (dx < 0) next();
+    else prev();
   };
+
+  const currentItem = photos[currentIndex];
 
   return (
     <div className="bg-black text-white min-h-screen">
@@ -104,76 +149,92 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---- FOTO GALERİ (KAYDIRMALI) ---- */}
+      {/* ---- FOTO GALERİ (INSTAGRAM CAROUSEL STİLİ + AUTOPLAY) ---- */}
       <section className="py-20 bg-black">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-between gap-4 mb-6">
             <h2 className="text-4xl font-bold">Galeri</h2>
 
-            {/* Kaydırma okları */}
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                onClick={() => scrollByAmount("left")}
-                className="p-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/10"
-                aria-label="Sola kaydır"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" stroke="white" fill="none">
-                  <path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => scrollByAmount("right")}
-                className="p-2 rounded-md bg-white/10 hover:bg-white/20 border border-white/10"
-                aria-label="Sağa kaydır"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" stroke="white" fill="none">
-                  <path d="M9 6l6 6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
+            {/* sayaç */}
+            <div className="text-white/60 text-sm">
+              {currentIndex + 1} / {photos.length}
             </div>
           </div>
 
-          {/* Kenar parıltıları */}
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black to-transparent" />
+          <div
+            className="relative w-full h-[60vw] md:h-[500px] flex items-center justify-center overflow-hidden"
+            onMouseEnter={() => setIsHoveringCarousel(true)}
+            onMouseLeave={() => setIsHoveringCarousel(false)}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
+            {/* Katmanlı kartlar */}
+            {photos.map((item, idx) => {
+              const isActive = idx === currentIndex;
+              const offset = idx - currentIndex; // negatif: sol, pozitif: sağ
 
-            {/* Track */}
-            <div
-              ref={trackRef}
-              className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth scrollbar-thin scrollbar-thumb-white/20"
+              // katman davranışı: en fazla +/-2 görünür olsun, diğerleri fade-out
+              const visible = Math.abs(offset) <= 2;
+
+              return (
+                <motion.button
+                  key={idx}
+                  onClick={() => openLightbox(idx)}
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-[78%] md:w-[62%] aspect-[4/3] rounded-xl overflow-hidden border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.35)] focus:outline-none"
+                  style={{ zIndex: visible ? 100 - Math.abs(offset) : 1, pointerEvents: visible ? "auto" : "none" }}
+                  animate={{
+                    x: offset * 70, // sağa/sola yatay kayma
+                    scale: isActive ? 1 : Math.max(0.82, 1 - Math.abs(offset) * 0.08),
+                    rotate: isActive ? 0 : offset * 1.5, // hafif bir eğim
+                    opacity: visible ? 1 : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 220, damping: 26 }}
+                  aria-label={item.alt ?? "Fotoğraf"}
+                >
+                  <Image
+                    src={item.thumb ?? item.src}
+                    alt={item.alt ?? "Fotoğraf"}
+                    fill
+                    sizes="(max-width: 768px) 78vw, 62vw"
+                    className="object-cover"
+                    priority={idx < 2}
+                  />
+
+                  {/* alt yazı şeridi */}
+                  {item.alt && (
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left">
+                      <span className="text-sm text-white/90">{item.alt}</span>
+                    </div>
+                  )}
+                </motion.button>
+              );
+            })}
+
+            {/* Önceki */}
+            <button
+              onClick={prev}
+              className="absolute left-2 md:left-6 p-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/10"
+              aria-label="Önceki"
             >
-              {photos.map((item, idx) => {
-                const thumb = item.thumb ?? item.src;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => openLightbox(idx)}
-                    className="relative snap-center shrink-0 w-[80vw] sm:w-[55vw] md:w-[40vw] lg:w-[28vw] aspect-[4/3] rounded-xl overflow-hidden border border-white/10 group focus:outline-none focus:ring-2 focus:ring-sky-400"
-                    aria-label={item.alt ?? "Fotoğraf"}
-                  >
-                    <Image
-                      src={thumb}
-                      alt={item.alt ?? "Fotoğraf"}
-                      fill
-                      sizes="(max-width: 640px) 80vw, (max-width: 768px) 55vw, (max-width: 1024px) 40vw, 28vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      priority={idx < 2}
-                    />
-                    {/* altta mini caption şeridi */}
-                    {item.alt && (
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left">
-                        <span className="text-sm text-white/90">{item.alt}</span>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+              <svg width="26" height="26" viewBox="0 0 24 24" stroke="white" fill="none">
+                <path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
 
-            {/* Mobil için alt yardım metni */}
-            <p className="mt-3 text-center text-white/60 text-sm md:hidden">Kaydırarak daha fazla fotoğraf gör ✨</p>
+            {/* Sonraki */}
+            <button
+              onClick={next}
+              className="absolute right-2 md:right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 border border-white/10"
+              aria-label="Sonraki"
+            >
+              <svg width="26" height="26" viewBox="0 0 24 24" stroke="white" fill="none">
+                <path d="M9 6l6 6-6 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
           </div>
+
+          {/* Mobil ipucu */}
+          <p className="mt-4 text-white/60 text-sm md:hidden">Sürükleyerek fotoğraflar arasında gez 👆</p>
         </div>
       </section>
 
