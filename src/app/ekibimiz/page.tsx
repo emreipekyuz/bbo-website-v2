@@ -55,6 +55,7 @@ export default function EkibimizPage() {
             <TeamCard name="Kardelen Kopmaz" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="İpek Bayık" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="Gülbahar Yüceyüksel" role="Kültür Sanat Komitesi Koordinatörü" />
+            <TeamCard name="Derya Kırlı" role="Kültür Sanat Komitesi Koordinatörü" src="/team/derya-kirli.jpg" />
 
             {/* Sosyal Etki */}
             <TeamCard name="Esra Gül Arslan" role="Sosyal Etki Komitesi Koordinatörü" />
@@ -65,7 +66,12 @@ export default function EkibimizPage() {
 
             {/* Boş slotlar */}
             {Array.from({ length: 5 }).map((_, i) => (
-              <TeamCard key={i} name={`Komite Koordinatörü ${i + 16}`} role="Koordinatör" />
+              <TeamCard
+                key={i}
+                name={`Komite Koordinatörü ${i + 16}`}
+                role="Koordinatör"
+                src="/team/placeholder.jpg"
+              />
             ))}
           </div>
         </section>
@@ -76,11 +82,11 @@ export default function EkibimizPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-6">
             <TeamCard name="Melsa Bedir" role="Program Koordinatörü" src="/team/melsa-bedir.jpg" />
             <TeamCard name="Emre İpekyüz" role="Program Koordinatörü" src="/team/emre-ipekyuz.jpg" />
-            <TeamCard name="Nehir Naz Yılmaz" role="Proje Koordinatörü" />
-            <TeamCard name="Şevval Güleç" role="Proje Koordinatörü" />
-            <TeamCard name="Beyza Kaya" role="Proje Koordinatörü" />
-            <TeamCard name="Dilek Öncü" role="Proje Koordinatörü" />
-            <TeamCard name="Nazrin Sanani" role="Proje Koordinatörü" />
+            <TeamCard name="Nehir Naz Yılmaz" role="Proje Koordinatörü" src="/team/placeholder.jpg" />
+            <TeamCard name="Şevval Güleç" role="Proje Koordinatörü" src="/team/placeholder.jpg" />
+            <TeamCard name="Beyza Kaya" role="Proje Koordinatörü" src="/team/placeholder.jpg" />
+            <TeamCard name="Dilek Öncü" role="Proje Koordinatörü" src="/team/placeholder.jpg" />
+            <TeamCard name="Nazrin Sanani" role="Proje Koordinatörü" src="/team/placeholder.jpg" />
           </div>
         </section>
       </div>
