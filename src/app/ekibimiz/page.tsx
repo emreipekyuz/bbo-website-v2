@@ -40,29 +40,20 @@ export default function EkibimizPage() {
         <section className="mt-16">
           <SectionTitle>Komite Koordinatörleri</SectionTitle>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {/* Eşitlik */}
-            <TeamCard name="Yağmur Akın" role="Eşitlik Komitesi Koordinatörü" />
-            <TeamCard name="Zeynep Sunay" role="Eşitlik Komitesi Koordinatörü" />
-
             {/* Gençlik */}
             <TeamCard name="Zehra Melek Tonka" role="Gençlik Komitesi Koordinatörü" />
             <TeamCard name="Ayşegül Sağdıç" role="Gençlik Komitesi Koordinatörü" />
-            <TeamCard name="Nilsu Uysal" role="Gençlik Komitesi Koordinatörü" />
 
             {/* Kültür Sanat */}
-            <TeamCard name="Maysa Ünal" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="Kübra Rüya Yıldırım" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="Kardelen Kopmaz" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="İpek Bayık" role="Kültür Sanat Komitesi Koordinatörü" />
-            <TeamCard name="Gülbahar Yüceyüksel" role="Kültür Sanat Komitesi Koordinatörü" />
             <TeamCard name="Derya Kırlı" role="Kültür Sanat Komitesi Koordinatörü" src="/team/derya-kirli.jpg" />
 
             {/* Sosyal Etki */}
             <TeamCard name="Esra Gül Arslan" role="Sosyal Etki Komitesi Koordinatörü" />
             <TeamCard name="Gözde Nur Kılınç" role="Sosyal Etki Komitesi Koordinatörü" />
             <TeamCard name="Umut Eylül Alan" role="Sosyal Etki Komitesi Koordinatörü" />
-            <TeamCard name="Gülsu Erdan" role="Sosyal Etki Komitesi Koordinatörü" />
-            <TeamCard name="Aleyna Koldaş" role="Sosyal Etki Komitesi Koordinatörü" />
 
             {/* Boş slotlar */}
             {Array.from({ length: 5 }).map((_, i) => (
